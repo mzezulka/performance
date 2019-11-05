@@ -31,21 +31,13 @@
 
 package com.hp.mwtests.ts.arjuna.performance;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.CommandLineOptionException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.openjdk.jmh.runner.options.TimeValue;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
@@ -53,13 +45,15 @@ import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import com.hp.mwtests.ts.arjuna.JMHConfigCore;
 
+import io.opentracing.util.GlobalTracer;
+
 //@Warmup(iterations = JMHConfigCore.WI, time = JMHConfigCore.WT)
 // , timeUnit = JMHConfigCore.WTU)
 //@Measurement(iterations = JMHConfigCore.MI, time = JMHConfigCore.MT)
 // , timeUnit = JMHConfigCore.MTU)
 //@Fork(JMHConfigCore.BF)
 //@Threads(JMHConfigCore.BT)
-public class Performance1 {
+public class Performance {
     @State(Scope.Thread)
     public static class BenchmarkState {
         private BasicRecord record1 = new BasicRecord();
@@ -67,8 +61,10 @@ public class Performance1 {
     };
 
     static {
+        TracingHelper.registerTracer();
         try {
-            BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class).setObjectStoreType(VolatileStore.class.getName());
+            BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class)
+                    .setObjectStoreType(VolatileStore.class.getName());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -97,7 +93,46 @@ public class Performance1 {
         return true;
     }
 
+    @Benchmark
+    public boolean twoPhaseSubordinate(BenchmarkState benchmarkState) {
+        AtomicAction root = new AtomicAction();
+        root.begin();
+        AtomicAction child1 = new AtomicAction();
+        child1.add(benchmarkState.record1);
+        if (!root.addChildAction(child1)) {
+            return false;
+        }
+        AtomicAction child2 = new AtomicAction();
+        child2.add(benchmarkState.record2);
+        if (!root.addChildAction(child2)) {
+            return false;
+        }
+        root.commit();
+        return true;
+    }
+
+    @Benchmark
+    public boolean userDefinedAbort(BenchmarkState benchmarkState) {
+        AtomicAction a = new AtomicAction();
+        a.begin();
+        a.add(benchmarkState.record1);
+        a.abort();
+        return true;
+    }
+
+    @Benchmark
+    public boolean businessTimeout(BenchmarkState benchmarkState) {
+        AtomicAction a = new AtomicAction();
+        a.begin(1);
+        try {
+            Thread.sleep(1100, 0);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
     public static void main(String[] args) throws RunnerException, CommandLineOptionException {
-        JMHConfigCore.runJTABenchmark(Performance1.class.getSimpleName(), args);
+        JMHConfigCore.runJTABenchmark(Performance.class.getSimpleName(), args);
     }
 }

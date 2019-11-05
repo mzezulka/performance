@@ -76,7 +76,7 @@ public class CheckedActionTest {
         }
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean testCheckedAction (BenchmarkState state)
     {
         int actionCount = 10;
@@ -105,7 +105,7 @@ public class CheckedActionTest {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean testThreadActionData (BenchmarkState state) {
 
         AtomicAction A = new AtomicAction();

@@ -29,7 +29,7 @@ public class JMHConfigCore {
 
     public static final Runner getCoreRunner(String[] args) throws CommandLineOptionException {
 
-        for (String arg : args)
+        for (String arg : args) 
             if (arg.startsWith("-"))
                 return new Runner(new CommandLineOptions(args));
 

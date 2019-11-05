@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- JBoss, Home of Professional Open Source Copyright 2008, Red Hat Middleware 
-  LLC, and others contributors as indicated by the @authors tag. All rights 
-  reserved. See the copyright.txt in the distribution for a full listing of 
-  individual contributors. This copyrighted material is made available to anyone 
-  wishing to use, modify, copy, or redistribute it subject to the terms and 
-  conditions of the GNU Lesser General Public License, v. 2.1. This program 
-  is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-  PURPOSE. See the GNU Lesser General Public License for more details. You 
-  should have received a copy of the GNU Lesser General Public License, v.2.1 
-  along with this distribution; if not, write to the Free Software Foundation, 
-  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    LLC, and others contributors as indicated by the @authors tag. All rights 
+    reserved. See the copyright.txt in the distribution for a full listing of 
+    individual contributors. This copyrighted material is made available to anyone 
+    wishing to use, modify, copy, or redistribute it subject to the terms and 
+    conditions of the GNU Lesser General Public License, v. 2.1. This program 
+    is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+    PURPOSE. See the GNU Lesser General Public License for more details. You 
+    should have received a copy of the GNU Lesser General Public License, v.2.1 
+    along with this distribution; if not, write to the Free Software Foundation, 
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.jboss.narayana</groupId>
         <artifactId>narayana-perf</artifactId>
@@ -73,7 +75,8 @@
                         <configuration>
                             <finalName>benchmarks</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.openjdk.jmh.Main</mainClass>
                                 </transformer>
                             </transformers>
@@ -86,8 +89,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!-- exclude everything by default then the not-ibmorb and ibmorb profiles can
-                         selectively include/exclude specific tests -->
+                    <!-- exclude everything by default then the not-ibmorb 
+                        and ibmorb profiles can selectively include/exclude specific tests -->
                     <excludes>
                         <exclude>**/*.java</exclude>
                     </excludes>
@@ -105,21 +108,36 @@
     </build>
 
     <dependencies>
-        <dependency>                                         
-            <groupId>org.openjdk.jmh</groupId>               
-            <artifactId>jmh-core</artifactId>                
-            <version>${jmh.version}</version>                
-        </dependency>                                        
-        <dependency>                                         
-            <groupId>org.openjdk.jmh</groupId>               
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jaegertracing</groupId>
+            <artifactId>jaeger-core</artifactId>
+            <version>0.35.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>                
-            <scope>provided</scope>                          
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.arjunacore</groupId>
             <artifactId>arjunacore</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta</artifactId>
+            <version>5.9.6.Final-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
