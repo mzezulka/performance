@@ -59,7 +59,7 @@ public class PerformanceJTA {
         }
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean commit(BenchmarkState benchmarkState) {
         try {
             benchmarkState.tm.begin();
@@ -84,7 +84,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean rollback(BenchmarkState benchmarkState) {
         try {
             benchmarkState.tm.begin();
@@ -96,7 +96,7 @@ public class PerformanceJTA {
         return false;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean timeout(BenchmarkState benchmarkState) {
         try {
             benchmarkState.tm.begin();
