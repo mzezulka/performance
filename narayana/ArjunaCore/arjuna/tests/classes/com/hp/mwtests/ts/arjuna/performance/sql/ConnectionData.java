@@ -58,7 +58,6 @@ public class ConnectionData implements Cloneable {
     public static class Builder {
         private String host = System.getProperty(ConnectionData.HOST_PARAM);
         private String port = System.getProperty(ConnectionData.PORT_PARAM);
-        private String url = System.getProperty(ConnectionData.URL_PARAM);
         private String db = System.getProperty(ConnectionData.DATABASE_PARAM, "crashrec");
         private String user = System.getProperty(ConnectionData.USER_PARAM, "crashrec");
         private String pass = System.getProperty(ConnectionData.PASSWORD_PARAM, "crashrec");
@@ -66,11 +65,6 @@ public class ConnectionData implements Cloneable {
         public Builder() {
             this.host = System.getProperty(ConnectionData.HOST_PARAM);
             this.port = System.getProperty(ConnectionData.PORT_PARAM);
-            this.url = System.getProperty(ConnectionData.URL_PARAM);
-
-            if (url == null && (host == null || port == null)) {
-                throw new NullPointerException("url or host and port is not defined");
-            }
         }
 
         /**
