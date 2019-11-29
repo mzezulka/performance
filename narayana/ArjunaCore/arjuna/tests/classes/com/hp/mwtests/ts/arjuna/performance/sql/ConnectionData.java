@@ -91,6 +91,16 @@ public class ConnectionData implements Cloneable {
             return this;
         }
 
+        public Builder host(String host) {
+            this.host = host;
+            return this;
+        }
+        
+        public Builder port(String port) {
+            this.port = port;
+            return this;
+        }
+        
         public ConnectionData build() {
             String connUrl = "jdbc:h2:~" + "/" + db;
             return new ConnectionData(connUrl, this);

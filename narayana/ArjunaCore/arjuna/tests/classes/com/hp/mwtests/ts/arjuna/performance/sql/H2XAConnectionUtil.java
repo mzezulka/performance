@@ -16,7 +16,7 @@ public class H2XAConnectionUtil {
     protected ConnectionData data;
 
     public H2XAConnectionUtil() {
-        ConnectionData.Builder dataBuilder = new ConnectionData.Builder().user("sa").pass("sa").db("test");
+        ConnectionData.Builder dataBuilder = new ConnectionData.Builder().user("sa").pass("sa").db("test").host("localhost").port("9092");
         data = dataBuilder.build();
     }
 
