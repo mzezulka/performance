@@ -35,6 +35,9 @@ public class JdbcXAResourceProvider {
     }
     
     public XAResource getJdbcResource() {
+        if(xaConn == null) {
+            init();
+        }
         try {
             return xaConn.getXAResource();
         } catch (SQLException e) {
