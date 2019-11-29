@@ -29,9 +29,8 @@ public class H2XAConnectionUtil {
             ds.setPassword(data.pass());
             return ds.getXAConnection();
         } catch (Exception e) {
-            new RuntimeException(getCreateXAConnectionErrorString(data), e);
+            throw new RuntimeException(getCreateXAConnectionErrorString(data), e);
         }
-        return null;
     }
 
     public void setConnectionData(ConnectionData data) {
