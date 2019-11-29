@@ -32,23 +32,39 @@ package com.hp.mwtests.ts.arjuna.performance;
  */
 import javax.transaction.TransactionManager;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.CommandLineOptionException;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import com.hp.mwtests.ts.arjuna.JMHConfigCore;
+import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 
-import io.opentracing.util.GlobalTracer;
-
+@State(Scope.Benchmark)
 public class PerformanceJTA {
-    @State(Scope.Benchmark)
-    public static class BenchmarkState {
-        private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-    };
-    
+
+    private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    private JdbcXAResourceProvider jdbcResProv = JdbcXAResourceProvider.getInstance();
+
+    @Setup(Level.Iteration)
+    public void setup() {
+        jdbcResProv.init();
+    }
+
+    @TearDown(Level.Iteration)
+    public void cleanup() {
+        try {
+            jdbcResProv.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     static {
         TracingHelper.registerTracer();
         try {
@@ -59,53 +75,66 @@ public class PerformanceJTA {
         }
     }
 
-    //@Benchmark
-    public boolean commit(BenchmarkState benchmarkState) {
+    // @Benchmark
+    public boolean commit() {
         try {
-            benchmarkState.tm.begin();
-            benchmarkState.tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            benchmarkState.tm.commit();
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return true;
     }
 
-    @Benchmark
-    public boolean twoPhaseCommit(BenchmarkState benchmarkState) {
+    // @Benchmark
+    public boolean twoPhaseCommit() {
         try {
-            benchmarkState.tm.begin();
-            benchmarkState.tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            benchmarkState.tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
-            benchmarkState.tm.commit();
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
+            tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return true;
     }
 
-    //@Benchmark
-    public boolean rollback(BenchmarkState benchmarkState) {
+    // @Benchmark
+    public boolean rollback() {
         try {
-            benchmarkState.tm.begin();
-            benchmarkState.tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            benchmarkState.tm.rollback();
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            tm.rollback();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return false;
+        return true;
     }
 
-    //@Benchmark
-    public boolean timeout(BenchmarkState benchmarkState) {
+    // @Benchmark
+    public boolean timeout() {
         try {
-            benchmarkState.tm.begin();
-            benchmarkState.tm.setTransactionTimeout(1);
+            tm.begin();
+            tm.setTransactionTimeout(1);
             Thread.sleep(1100);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         // ABRT
+        return true;
+    }
+
+    @Benchmark
+    public boolean realResource() {
+        try {
+            tm.begin();
+            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
+            jdbcResProv.executeStatement();
+            tm.commit();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return false;
     }
 

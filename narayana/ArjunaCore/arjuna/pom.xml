@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.jboss.narayana</groupId>
         <artifactId>narayana-perf</artifactId>
-        <version>5.10.0.Final</version>
+        <version>5.9.6.benchmark.noop</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -149,6 +149,11 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
             <version>${version.org.jboss.logging.jboss-logging-processor}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
         </dependency>
     </dependencies>
 </project>

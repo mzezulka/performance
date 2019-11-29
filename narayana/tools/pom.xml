@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jboss.narayana</groupId>
     <artifactId>narayana-all</artifactId>
-    <version>5.10.0.Final</version>
+    <version>5.9.6.benchmark.noop</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.jboss.narayana.perf</groupId>
@@ -17,7 +17,6 @@
       <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
     </license>
   </licenses>
-
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -39,23 +38,22 @@
   </dependencies>
   <profiles>
     <profile>
-        <id>release</id>
-        <build>
-            <plugins>
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <id>default-install</id>
-                    <phase>install</phase>
-                  </execution>
-                </executions>
-                <inherited>false</inherited>
-              </plugin>
-            </plugins>
-        </build>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-install</id>
+                <phase>install</phase>
+              </execution>
+            </executions>
+            <inherited>false</inherited>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
-
