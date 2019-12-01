@@ -50,7 +50,7 @@ public class JdbcXAResourceProvider {
         try {
             conn = xaConn.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException("<init>: Cannot create a singleton instance", e);
+            throw new RuntimeException(e);
         }
     }
 

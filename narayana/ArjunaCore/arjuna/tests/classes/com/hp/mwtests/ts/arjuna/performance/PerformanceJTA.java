@@ -49,7 +49,7 @@ import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 public class PerformanceJTA {
 
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-    private JdbcXAResourceProvider jdbcResProv = JdbcXAResourceProvider.getInstance();
+    private JdbcXAResourceProvider jdbcResProv;
 
     private void setup() {
         jdbcResProv.init();
@@ -125,6 +125,7 @@ public class PerformanceJTA {
 
     @Benchmark
     public boolean realResource() {
+        jdbcResProv = JdbcXAResourceProvider.getInstance();
         setup();
         try {
             tm.begin();
