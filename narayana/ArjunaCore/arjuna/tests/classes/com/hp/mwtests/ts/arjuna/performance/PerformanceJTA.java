@@ -56,7 +56,7 @@ public class PerformanceJTA {
         jdbcResProv.init();
     }
 
-    @Setup(Level.Iteration)
+    @TearDown(Level.Iteration)
     public void cleanup() {
         try {
             jdbcResProv.close();
