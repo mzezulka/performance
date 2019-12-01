@@ -39,7 +39,7 @@ public class H2XAConnectionUtil {
             JdbcDataSource ds = new JdbcDataSource();
             ds.setUser(data.user());
             ds.setPassword(data.pass());
-            classloadDriver();
+            ds.setUrl(data.url());
             return ds.getXAConnection();
         } catch (Exception e) {
             throw new RuntimeException(getCreateXAConnectionErrorString(data), e);
