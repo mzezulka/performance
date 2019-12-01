@@ -52,12 +52,12 @@ public class PerformanceJTA {
     private JdbcXAResourceProvider jdbcResProv = JdbcXAResourceProvider.getInstance();
 
     @Setup(Level.Iteration)
-    private void setup() {
+    public void setup() {
         jdbcResProv.init();
     }
 
     @Setup(Level.Iteration)
-    private void cleanup() {
+    public void cleanup() {
         try {
             jdbcResProv.close();
         } catch (Exception e) {
