@@ -51,13 +51,11 @@ public class PerformanceJTA {
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
     private JdbcXAResourceProvider jdbcResProv = JdbcXAResourceProvider.getInstance();
 
-    @Setup(Level.Iteration)
-    public void setup() {
+    private void setup() {
         jdbcResProv.init();
     }
 
-    @TearDown(Level.Iteration)
-    public void cleanup() {
+    private void cleanup() {
         try {
             jdbcResProv.close();
         } catch (Exception e) {
@@ -127,6 +125,7 @@ public class PerformanceJTA {
 
     @Benchmark
     public boolean realResource() {
+        setup();
         try {
             tm.begin();
             tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
@@ -135,6 +134,7 @@ public class PerformanceJTA {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        cleanup();
         return false;
     }
 
