@@ -101,19 +101,6 @@ public class PerformanceJTA {
     }
 
     @Benchmark
-    public boolean timeout() {
-        try {
-            tm.begin();
-            tm.setTransactionTimeout(1);
-            Thread.sleep(1100);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        // ABRT
-        return true;
-    }
-
-    @Benchmark
     public boolean realResource() {
         try {
             tm.begin();
