@@ -26,7 +26,7 @@ Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     <groupId>org.jboss.narayana</groupId>
     <artifactId>narayana-perf</artifactId>
     <!-- we want to match the tracing fork version -->
-    <version>5.9.6.benchmark.noop</version>
+    <version>5.10.0.Final</version>
     <packaging>pom</packaging>
     <name>Narayana: performance testing</name>
     <description>performance testing</description>
