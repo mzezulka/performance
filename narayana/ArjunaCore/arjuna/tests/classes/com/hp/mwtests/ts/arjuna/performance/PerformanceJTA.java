@@ -116,9 +116,10 @@ public class PerformanceJTA {
     @Benchmark
     public boolean timeout() {
         try {
-            tm.begin();
             tm.setTransactionTimeout(1);
-            Thread.sleep(1100);
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            Thread.sleep(1200);
             throw new RuntimeException("Exceeded transaction timeout but still running.");
         } catch (Exception e) {
             throw new RuntimeException(e);
