@@ -112,6 +112,18 @@ public class PerformanceJTA {
         }
         return false;
     }
+    
+    @Benchmark
+    public boolean timeout() {
+        try {
+            tm.begin();
+            tm.setTransactionTimeout(1);
+            Thread.sleep(1100);
+            throw new RuntimeException("Exceeded transaction timeout but still running.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void main(String[] args) throws RunnerException, CommandLineOptionException {
         JMHConfigCore.runJTABenchmark(PerformanceJTA.class.getSimpleName(), args);

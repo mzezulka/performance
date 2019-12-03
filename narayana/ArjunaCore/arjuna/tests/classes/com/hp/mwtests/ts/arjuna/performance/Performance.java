@@ -70,7 +70,7 @@ public class Performance {
         }
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean twoPhase(BenchmarkState benchmarkState) {
         AtomicAction A = new AtomicAction();
 
@@ -82,7 +82,7 @@ public class Performance {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean twoPhaseSubordinate(BenchmarkState benchmarkState) {
         AtomicAction root = new AtomicAction();
         root.begin();
@@ -100,7 +100,7 @@ public class Performance {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean userDefinedAbort(BenchmarkState benchmarkState) {
         AtomicAction a = new AtomicAction();
         a.begin();
@@ -109,7 +109,7 @@ public class Performance {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean businessTimeout(BenchmarkState benchmarkState) {
         AtomicAction a = new AtomicAction();
         a.begin(1);
