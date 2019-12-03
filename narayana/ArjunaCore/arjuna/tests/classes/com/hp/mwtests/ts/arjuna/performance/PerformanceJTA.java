@@ -75,19 +75,7 @@ public class PerformanceJTA {
         }
     }
 
-    // @Benchmark
-    public boolean commit() {
-        try {
-            tm.begin();
-            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            tm.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return true;
-    }
-
-    // @Benchmark
+    @Benchmark
     public boolean twoPhaseCommit() {
         try {
             tm.begin();
@@ -100,7 +88,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    // @Benchmark
+    @Benchmark
     public boolean rollback() {
         try {
             tm.begin();
@@ -112,7 +100,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    // @Benchmark
+    @Benchmark
     public boolean timeout() {
         try {
             tm.begin();
