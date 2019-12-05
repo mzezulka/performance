@@ -182,17 +182,17 @@
         <dependency>
             <groupId>org.jboss.narayana</groupId>
             <artifactId>common</artifactId>
-            <version>${narayana.version}</version>
+            <version>${org.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.arjunacore</groupId>
             <artifactId>arjuna</artifactId>
-            <version>${narayana.version}</version>
+            <version>${org.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.jta</groupId>
             <artifactId>jta</artifactId>
-            <version>${narayana.version}</version>
+            <version>${org.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -280,12 +280,12 @@
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
             <artifactId>restat-util</artifactId>
-            <version>${narayana.version}</version>
+            <version>${org.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
             <artifactId>restat-api</artifactId>
-            <version>${narayana.version}</version>
+            <version>${org.jboss.narayana.version}</version>
         </dependency>
 
 
