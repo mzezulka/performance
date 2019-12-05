@@ -1,27 +1,18 @@
 package com.hp.mwtests.ts.arjuna.performance.sql;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.XAConnection;
-import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
-import javax.transaction.xa.Xid;
 
 public class JdbcXAResourceProvider {
-
-    private static final JdbcXAResourceProvider INSTANCE = new JdbcXAResourceProvider();
+  
     private final H2XAConnectionUtil util;
     private XAConnection xaConn;
     private Connection conn;
 
-    public static JdbcXAResourceProvider getInstance() {
-        return INSTANCE;
-    }
-
-    private JdbcXAResourceProvider() {
+    public JdbcXAResourceProvider() {
         util = new H2XAConnectionUtil();
         util.createTestTable();
     }
