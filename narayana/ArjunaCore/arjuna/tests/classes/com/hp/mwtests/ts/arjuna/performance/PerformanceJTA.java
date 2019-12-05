@@ -45,7 +45,7 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import com.hp.mwtests.ts.arjuna.JMHConfigCore;
 import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 public class PerformanceJTA {
 
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
