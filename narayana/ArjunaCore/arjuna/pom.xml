@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.jboss.narayana</groupId>
         <artifactId>narayana-perf</artifactId>
-        <version>5.9.6.benchmark.noop</version>
+        <version>5.9.6.Final</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
