@@ -75,7 +75,7 @@ public class PerformanceJTA {
         }
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean twoPhaseCommit() {
         try {
             tm.begin();
@@ -88,7 +88,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean rollback() {
         try {
             tm.begin();
@@ -113,7 +113,7 @@ public class PerformanceJTA {
         return false;
     }
     
-    @Benchmark
+    //@Benchmark
     public boolean timeout() {
         try {
             tm.setTransactionTimeout(1);
