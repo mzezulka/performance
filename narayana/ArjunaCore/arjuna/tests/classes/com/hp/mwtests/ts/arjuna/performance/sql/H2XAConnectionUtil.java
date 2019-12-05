@@ -15,6 +15,7 @@ public class H2XAConnectionUtil {
     private static final String testTableName = "PERF";
     private static final String driverClass = "org.h2.Driver";
     protected ConnectionData data;
+    private static boolean testTableExists = false; 
 
     public H2XAConnectionUtil() {
         ConnectionData.Builder dataBuilder = new ConnectionData.Builder().user("sa").pass("sa").db("test")
@@ -68,7 +69,8 @@ public class H2XAConnectionUtil {
         return isClassLoaded(driverClass);
     }
 
-    public void createTestTable() {
+    public void createTestTableIfNecessary() {
+        if(testTableExists) return;
         try (Connection con = getConnection()) {
             Statement stmt = con.createStatement();
 
@@ -78,6 +80,7 @@ public class H2XAConnectionUtil {
                 // when table does not exist we ignore failure from DROP
             }
             stmt.executeUpdate("CREATE TABLE " + testTableName + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
+            testTableExists = true;
         } catch (Exception e) {
             String msgerr = String.format("Can't create table %s", testTableName);
             throw new RuntimeException(msgerr, e);
