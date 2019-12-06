@@ -7,22 +7,16 @@ import javax.sql.XAConnection;
 import javax.transaction.xa.XAResource;
 
 public class JdbcXAResourceProvider {
-  
-    private final H2XAConnectionUtil util;
     private XAConnection xaConn;
     private Connection conn;
-
-    public JdbcXAResourceProvider() {
-        util = new H2XAConnectionUtil();
-    }
     
-    public void createTestTableIfNecessary() {
-        util.createTestTableIfNecessary();
+    public static void createTestTableIfNecessary() {
+        H2XAConnectionUtil.createTestTableIfNecessary();
     }
 
     public void executeStatement() {
         try {
-            util.prepareInsertQuery(conn, 1, "hello perf test").executeUpdate();
+            H2XAConnectionUtil.prepareInsertQuery(conn, 1, "hello perf test").executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -40,7 +34,7 @@ public class JdbcXAResourceProvider {
     }
 
     public void init() {
-        xaConn = util.getXAConnection();
+        xaConn = H2XAConnectionUtil.getXAConnection();
         try {
             conn = xaConn.getConnection();
         } catch (SQLException e) {

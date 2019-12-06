@@ -3,7 +3,6 @@ package com.hp.mwtests.ts.arjuna.performance.sql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -13,16 +12,11 @@ import org.h2.jdbcx.JdbcDataSource;
 
 public class H2XAConnectionUtil {
 
-    private static final String testTableName = "PERF_" + charTimestamp();
-    private static final String driverClass = "org.h2.Driver";
-    protected ConnectionData data;
-    private static boolean testTableExists = false; 
-
-    public H2XAConnectionUtil() {
-        ConnectionData.Builder dataBuilder = new ConnectionData.Builder().user("sa").pass("sa").db("test")
-                .host("localhost").port("9092");
-        data = dataBuilder.build();
-    }
+    private static final String TEST_TABLE_NAME = "PERF_" + charTimestamp();
+    private static final String DRIVER_CLASS = "org.h2.Driver";
+    private static ConnectionData data = new ConnectionData.Builder().user("sa").pass("sa").db("test")
+            .host("localhost").port("9092").build();
+    private static boolean testTableExists = false;
 
     private static String charTimestamp() {
         int diff = 'a' - '0';
@@ -34,10 +28,10 @@ public class H2XAConnectionUtil {
         return sb.toString();
     }
     
-    private synchronized void classloadDriver() {
+    private static synchronized void classloadDriver() {
         try {
-            if (!isClassLoaded(driverClass)) {
-                Class.forName(driverClass);
+            if (!isClassLoaded(DRIVER_CLASS)) {
+                Class.forName(DRIVER_CLASS);
             }
         } catch (Exception e) {
             throw new RuntimeException(
@@ -45,7 +39,7 @@ public class H2XAConnectionUtil {
         }
     }
 
-    public XAConnection getXAConnection() {
+    public static XAConnection getXAConnection() {
         try {
             // Create the XA data source and XA ready connection.
             JdbcDataSource ds = new JdbcDataSource();
@@ -66,7 +60,7 @@ public class H2XAConnectionUtil {
         return this.data;
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         try {
             classloadDriver();
             return DriverManager.getConnection(data.url(), data.user(), data.pass());
@@ -76,46 +70,35 @@ public class H2XAConnectionUtil {
         }
     }
 
-    public boolean isDriverClassLoaded() throws Exception {
-        return isClassLoaded(driverClass);
+    public static boolean isDriverClassLoaded() throws Exception {
+        return isClassLoaded(DRIVER_CLASS);
     }
 
-    public void createTestTableIfNecessary() {
+    public static void createTestTableIfNecessary() {
         if(testTableExists) return;
         try (Connection con = getConnection()) {
             Statement stmt = con.createStatement();
 
             try {
-                stmt.executeUpdate("DROP TABLE " + testTableName);
+                stmt.executeUpdate("DROP TABLE " + TEST_TABLE_NAME);
             } catch (Exception e) {
                 // when table does not exist we ignore failure from DROP
             }
-            stmt.executeUpdate("CREATE TABLE " + testTableName + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
+            stmt.executeUpdate("CREATE TABLE " + TEST_TABLE_NAME + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
             testTableExists = true;
         } catch (Exception e) {
-            String msgerr = String.format("Can't create table %s", testTableName);
+            String msgerr = String.format("Can't create table %s", TEST_TABLE_NAME);
             throw new RuntimeException(msgerr, e);
         }
     }
 
-    public String getVarCharTypeSpec() {
+    public static String getVarCharTypeSpec() {
         return "varchar";
     }
 
-    public ResultSet selectTestTable(Connection con) {
+    public static PreparedStatement prepareInsertQuery(Connection con, int index, String value) {
         try {
-            // Open a new connection and read back the record to verify that it
-            // worked.
-            return con.createStatement().executeQuery("SELECT * FROM " + testTableName);
-        } catch (Exception e) {
-            String msgerr = String.format("Can't do select of table %s on connection %s", testTableName, con);
-            throw new RuntimeException(msgerr, e);
-        }
-    }
-
-    public PreparedStatement prepareInsertQuery(Connection con, int index, String value) {
-        try {
-            PreparedStatement pstmt = con.prepareStatement("INSERT INTO " + testTableName + " (f1,f2) VALUES (?, ?)");
+            PreparedStatement pstmt = con.prepareStatement("INSERT INTO " + TEST_TABLE_NAME + " (f1,f2) VALUES (?, ?)");
             pstmt.setInt(1, index);
             pstmt.setString(2, value);
             return pstmt;
@@ -126,12 +109,12 @@ public class H2XAConnectionUtil {
         }
     }
 
-    protected String getCreateXAConnectionErrorString(ConnectionData connectionData) {
+    protected static String getCreateXAConnectionErrorString(ConnectionData connectionData) {
         return String.format("Can't create XA connection to: %s:%s %s/%s/%s", connectionData.host(),
                 connectionData.port(), connectionData.db(), connectionData.user(), connectionData.pass());
     }
 
-    private boolean isClassLoaded(String className) throws Exception {
+    private static boolean isClassLoaded(String className) throws Exception {
         java.lang.reflect.Method m = ClassLoader.class.getDeclaredMethod("findLoadedClass",
                 new Class[] { String.class });
         m.setAccessible(true);

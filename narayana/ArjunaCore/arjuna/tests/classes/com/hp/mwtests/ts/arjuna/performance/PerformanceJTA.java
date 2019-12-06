@@ -45,22 +45,23 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import com.hp.mwtests.ts.arjuna.JMHConfigCore;
 import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 
+@State(Scope.Thread)
 public class PerformanceJTA {
-
-    @State(Scope.Thread)
-    public static class Tm {
-        private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();    
+    
+    private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();    
+    private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
+    
+    @Setup(Level.Trial)
+    public void setup() {
+        jdbcResProv.init();
+        JdbcXAResourceProvider.createTestTableIfNecessary();
     }
     
-    @State(Scope.Benchmark)
-    public static class JdbcRes {
-        private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
-        
-        public JdbcRes() {
-            this.jdbcResProv.init();
-            this.jdbcResProv.createTestTableIfNecessary();
-        }
+    @TearDown(Level.Trial)
+    public void finish() {
+        jdbcResProv.close();
     }
+    
 
     static {
         TracingHelper.registerTracer();
@@ -73,12 +74,12 @@ public class PerformanceJTA {
     }
 
     //@Benchmark
-    public boolean twoPhaseCommit(Tm tm) {
+    public boolean twoPhaseCommit() {
         try {
-            tm.tm.begin();
-            tm.tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            tm.tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
-            tm.tm.commit();
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
+            tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -86,11 +87,11 @@ public class PerformanceJTA {
     }
 
     //@Benchmark
-    public boolean rollback(Tm tm) {
+    public boolean rollback() {
         try {
-            tm.tm.begin();
-            tm.tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            tm.tm.rollback();
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            tm.rollback();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -98,27 +99,27 @@ public class PerformanceJTA {
     }
 
     @Benchmark
-    public boolean realResource(JdbcRes r, Tm tm) {
-        r.jdbcResProv.init();
+    public boolean realResource() {
+        jdbcResProv.init();
         try {
-            tm.tm.begin();
-            tm.tm.getTransaction().enlistResource(r.jdbcResProv.getJdbcResource());
-            r.jdbcResProv.executeStatement();
-            tm.tm.commit();
+            tm.begin();
+            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
+            jdbcResProv.executeStatement();
+            tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            r.jdbcResProv.close();
+            jdbcResProv.close();
         }
         return false;
     }
     
     //@Benchmark
-    public boolean timeout(Tm tm) {
+    public boolean timeout() {
         try {
-            tm.tm.setTransactionTimeout(1);
-            tm.tm.begin();
-            tm.tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            tm.setTransactionTimeout(1);
+            tm.begin();
+            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
             Thread.sleep(1200);
             throw new RuntimeException("Exceeded transaction timeout but still running.");
         } catch (Exception e) {
