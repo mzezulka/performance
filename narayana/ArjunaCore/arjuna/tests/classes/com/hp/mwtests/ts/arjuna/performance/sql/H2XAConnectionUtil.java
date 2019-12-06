@@ -79,34 +79,12 @@ public class H2XAConnectionUtil {
             } catch (Exception e) {
                 // when table does not exist we ignore failure from DROP
             }
-            stmt.executeUpdate("CREATE TABLE " + testTableName + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
+            stmt.executeUpdate("IF object_id('" + testTableName + "') is null\n"
+                    + "    CREATE TABLE " + testTableName + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
             testTableExists = true;
         } catch (Exception e) {
             String msgerr = String.format("Can't create table %s", testTableName);
             throw new RuntimeException(msgerr, e);
-        }
-    }
-
-    public void createTestTableWithDrop(String tableName) {
-        tableName = tableName == null || tableName.isEmpty() ? testTableName : tableName;
-
-        try (Connection con = getConnection()) {
-            // Create a test table.
-            Statement stmt = con.createStatement();
-            try {
-                System.out.println("Dropping table '" + tableName + "'");
-                stmt.executeUpdate("DROP TABLE " + tableName);
-            } catch (Exception e) {
-                System.out.println("Dropping table " + tableName + " ended with error: " + e.getMessage());
-            }
-
-            System.out.println("Creating table '" + tableName + "'");
-            stmt.executeUpdate("CREATE TABLE " + tableName + " (id int, value " + getVarCharTypeSpec() + ")");
-            stmt.close();
-        } catch (Exception e) {
-            // Handle any errors that may have occurred.
-            e.printStackTrace();
-            throw new RuntimeException(e);
         }
     }
 
