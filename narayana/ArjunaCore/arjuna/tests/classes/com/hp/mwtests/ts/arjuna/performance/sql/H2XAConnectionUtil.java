@@ -6,13 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 import javax.sql.XAConnection;
 import org.h2.jdbcx.JdbcDataSource;
 
 public class H2XAConnectionUtil {
 
-    private static final String testTableName = "PERF";
+    private static final String testTableName = "PERF-" +  new Timestamp(System.currentTimeMillis()).getTime();
     private static final String driverClass = "org.h2.Driver";
     protected ConnectionData data;
     private static boolean testTableExists = false; 
@@ -79,8 +80,7 @@ public class H2XAConnectionUtil {
             } catch (Exception e) {
                 // when table does not exist we ignore failure from DROP
             }
-            stmt.executeUpdate("IF object_id('" + testTableName + "') is null\n"
-                    + "    CREATE TABLE " + testTableName + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
+            stmt.executeUpdate("CREATE TABLE " + testTableName + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
             testTableExists = true;
         } catch (Exception e) {
             String msgerr = String.format("Can't create table %s", testTableName);

@@ -51,6 +51,11 @@ public class PerformanceJTA {
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
     private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
 
+    @Setup(Level.Trial)
+    public void setupTable() {
+        jdbcResProv.createTestTable();
+    }
+    
     @Setup(Level.Iteration)
     public void setup() {
         jdbcResProv.init();
