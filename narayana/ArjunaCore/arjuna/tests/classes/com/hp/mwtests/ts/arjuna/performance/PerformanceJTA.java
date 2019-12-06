@@ -98,10 +98,11 @@ public class PerformanceJTA {
             tm.begin();
             tm.getTransaction().enlistResource(r.jdbcResProv.getJdbcResource());
             r.jdbcResProv.executeStatement();
-            r.jdbcResProv.close();
             tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            r.jdbcResProv.close();
         }
         return false;
     }
