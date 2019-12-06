@@ -25,7 +25,7 @@ public class H2XAConnectionUtil {
     }
 
     private static String charTimestamp() {
-        int diff = 'A' - '0';
+        int diff = 'a' - '0';
         String stamp = String.valueOf(new Timestamp(System.currentTimeMillis()).getTime());
         StringBuilder sb = new StringBuilder();
         for(char s : stamp.toCharArray()) {

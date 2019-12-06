@@ -52,7 +52,12 @@ public class PerformanceJTA {
     
     @State(Scope.Benchmark)
     public static class JdbcRes {
-        private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();    
+        private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
+        
+        public JdbcRes() {
+            this.jdbcResProv.init();
+            this.jdbcResProv.createTestTableIfNecessary();
+        }
     }
 
     static {
@@ -93,7 +98,6 @@ public class PerformanceJTA {
     @Benchmark
     public boolean realResource(JdbcRes r) {
         r.jdbcResProv.init();
-        r.jdbcResProv.createTestTableIfNecessary();
         try {
             tm.begin();
             tm.getTransaction().enlistResource(r.jdbcResProv.getJdbcResource());
