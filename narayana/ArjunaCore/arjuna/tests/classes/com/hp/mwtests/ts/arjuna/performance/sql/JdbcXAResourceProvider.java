@@ -16,7 +16,7 @@ public class JdbcXAResourceProvider {
         util = new H2XAConnectionUtil();
     }
     
-    public void createTestTable() {
+    public void createTestTableIfNecessary() {
         util.createTestTableIfNecessary();
     }
 

@@ -49,25 +49,10 @@ import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 public class PerformanceJTA {
 
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-    private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
-
-    @Setup(Level.Trial)
-    public void setupTable() {
-        jdbcResProv.createTestTable();
-    }
     
-    @Setup(Level.Iteration)
-    public void setup() {
-        jdbcResProv.init();
-    }
-
-    @TearDown(Level.Iteration)
-    public void cleanup() {
-        try {
-            jdbcResProv.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @State(Scope.Benchmark)
+    public static class JdbcRes {
+        private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();    
     }
 
     static {
@@ -106,11 +91,14 @@ public class PerformanceJTA {
     }
 
     @Benchmark
-    public boolean realResource() {
+    public boolean realResource(JdbcRes r) {
+        r.jdbcResProv.init();
+        r.jdbcResProv.createTestTableIfNecessary();
         try {
             tm.begin();
-            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
-            jdbcResProv.executeStatement();
+            tm.getTransaction().enlistResource(r.jdbcResProv.getJdbcResource());
+            r.jdbcResProv.executeStatement();
+            r.jdbcResProv.close();
             tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
