@@ -13,7 +13,7 @@ import org.h2.jdbcx.JdbcDataSource;
 
 public class H2XAConnectionUtil {
 
-    private static final String testTableName = "PERF-" +  new Timestamp(System.currentTimeMillis()).getTime();
+    private static final String testTableName = "PERF_" + charTimestamp();
     private static final String driverClass = "org.h2.Driver";
     protected ConnectionData data;
     private static boolean testTableExists = false; 
@@ -24,6 +24,16 @@ public class H2XAConnectionUtil {
         data = dataBuilder.build();
     }
 
+    private static String charTimestamp() {
+        int diff = 'A' - '0';
+        String stamp = String.valueOf(new Timestamp(System.currentTimeMillis()).getTime());
+        StringBuilder sb = new StringBuilder();
+        for(char s : stamp.toCharArray()) {
+            sb.append(s + diff);
+        }
+        return sb.toString();
+    }
+    
     private synchronized void classloadDriver() {
         try {
             if (!isClassLoaded(driverClass)) {
