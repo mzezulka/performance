@@ -76,7 +76,8 @@ public class H2XAConnectionUtil {
             // let's be cheeky and create another table instead
             try (Connection conn = getConnection()) {
                 TEST_TABLE_NAME = "PERF_" + timestamp();
-                conn.createStatement().executeUpdate("CREATE TABLE " + TEST_TABLE_NAME + " (f1 int, f2 " + getVarCharTypeSpec() + ")");    
+                conn.createStatement().executeUpdate("CREATE TABLE " + TEST_TABLE_NAME + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
+                testTableExists = true;
             } catch (SQLException sqle) {
                 // we can't be bothered trying at this point, really
                 throw new RuntimeException("Can't create table.", sqle);
