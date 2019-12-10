@@ -60,7 +60,7 @@ public class H2XAConnectionUtil {
         return isClassLoaded(DRIVER_CLASS);
     }
 
-    public static void createTestTableIfNecessary() {
+    public synchronized static void createTestTableIfNecessary() {
         if(testTableExists) return;
         try (Connection con = getConnection()) {
             Statement stmt = con.createStatement();
