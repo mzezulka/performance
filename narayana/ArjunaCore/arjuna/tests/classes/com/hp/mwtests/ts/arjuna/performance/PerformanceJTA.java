@@ -104,6 +104,7 @@ public class PerformanceJTA {
 //        try {
 //            tm.begin();
 //            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
+//            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
 //            jdbcResProv.executeStatement();
 //            tm.commit();
 //        } catch (Exception e) {
