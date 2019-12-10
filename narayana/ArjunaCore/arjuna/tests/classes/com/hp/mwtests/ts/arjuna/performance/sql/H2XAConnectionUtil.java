@@ -12,20 +12,14 @@ import org.h2.jdbcx.JdbcDataSource;
 
 public class H2XAConnectionUtil {
 
-    private static final String TEST_TABLE_NAME = "PERF_" + charTimestamp();
+    private static String TEST_TABLE_NAME = "PERF_" + timestamp();
     private static final String DRIVER_CLASS = "org.h2.Driver";
     private static ConnectionData data = new ConnectionData.Builder().user("sa").pass("sa").db("test")
             .host("localhost").port("9092").build();
     private static boolean testTableExists = false;
 
-    private static String charTimestamp() {
-        int diff = 'a' - '0';
-        String stamp = String.valueOf(new Timestamp(System.currentTimeMillis()).getTime());
-        StringBuilder sb = new StringBuilder();
-        for(char s : stamp.toCharArray()) {
-            sb.append(s + diff);
-        }
-        return sb.toString();
+    private static String timestamp() {
+        return String.valueOf(new Timestamp(System.currentTimeMillis()).getTime());
     }
     
     private static synchronized void classloadDriver() {
@@ -50,14 +44,6 @@ public class H2XAConnectionUtil {
         } catch (Exception e) {
             throw new RuntimeException(getCreateXAConnectionErrorString(data), e);
         }
-    }
-
-    public void setConnectionData(ConnectionData data) {
-        this.data = data;
-    }
-
-    public ConnectionData getConnectionData() {
-        return this.data;
     }
 
     public static Connection getConnection() {
@@ -87,8 +73,14 @@ public class H2XAConnectionUtil {
             stmt.executeUpdate("CREATE TABLE " + TEST_TABLE_NAME + " (f1 int, f2 " + getVarCharTypeSpec() + ")");
             testTableExists = true;
         } catch (Exception e) {
-            String msgerr = String.format("Can't create table %s", TEST_TABLE_NAME);
-            throw new RuntimeException(msgerr, e);
+            // let's be cheeky and create another table instead
+            try (Connection conn = getConnection()) {
+                TEST_TABLE_NAME = "PERF_" + timestamp();
+                conn.createStatement().executeUpdate("CREATE TABLE " + TEST_TABLE_NAME + " (f1 int, f2 " + getVarCharTypeSpec() + ")");    
+            } catch (SQLException sqle) {
+                // we can't be bothered trying at this point, really
+                throw new RuntimeException("Can't create table.", sqle);
+            }
         }
     }
 
