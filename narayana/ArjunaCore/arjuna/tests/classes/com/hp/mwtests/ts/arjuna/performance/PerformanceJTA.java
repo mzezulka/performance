@@ -114,7 +114,7 @@ public class PerformanceJTA {
         return false;
     }
     
-    //@Benchmark
+    @Benchmark
     public boolean timeout() {
         try {
             tm.setTransactionTimeout(1);
