@@ -73,7 +73,7 @@ public class PerformanceJTA {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public boolean twoPhaseCommit() {
         try {
             tm.begin();
