@@ -49,18 +49,18 @@ import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 public class PerformanceJTA {
     
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();    
-    private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
+    //private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
     
-    @Setup(Level.Trial)
-    public void setup() {
-        jdbcResProv.init();
-        JdbcXAResourceProvider.createTestTableIfNecessary();
-    }
+    //@Setup(Level.Trial)
+//    public void setup() {
+//        jdbcResProv.init();
+//        JdbcXAResourceProvider.createTestTableIfNecessary();
+//    }
     
-    @TearDown(Level.Trial)
-    public void finish() {
-        jdbcResProv.close();
-    }
+    //@TearDown(Level.Trial)
+//    public void finish() {
+//        jdbcResProv.close();
+//    }
     
 
     static {
@@ -98,23 +98,23 @@ public class PerformanceJTA {
         return true;
     }
 
-    @Benchmark
-    public boolean realResource() {
-        jdbcResProv.init();
-        try {
-            tm.begin();
-            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
-            jdbcResProv.executeStatement();
-            tm.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            jdbcResProv.close();
-        }
-        return false;
-    }
+    //@Benchmark
+//    public boolean realResource() {
+//        jdbcResProv.init();
+//        try {
+//            tm.begin();
+//            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
+//            jdbcResProv.executeStatement();
+//            tm.commit();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            jdbcResProv.close();
+//        }
+//        return false;
+//    }
     
-    @Benchmark
+    //@Benchmark
     public boolean timeout() {
         try {
             tm.setTransactionTimeout(1);
