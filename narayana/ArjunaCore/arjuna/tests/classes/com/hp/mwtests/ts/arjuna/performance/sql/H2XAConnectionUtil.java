@@ -1,6 +1,7 @@
 package com.hp.mwtests.ts.arjuna.performance.sql;
 
 import java.sql.Connection;
+
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,14 +9,14 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 import javax.sql.XAConnection;
+import static com.hp.mwtests.ts.arjuna.performance.sql.Constants.*;
 import org.h2.jdbcx.JdbcDataSource;
 
 public class H2XAConnectionUtil {
 
     private static String TEST_TABLE_NAME = "PERF_" + timestamp();
-    private static final String DRIVER_CLASS = "org.h2.Driver";
-    private static ConnectionData data = new ConnectionData.Builder().user("sa").pass("sa").db("test")
-            .host("localhost").port("9092").build();
+    private static ConnectionData data = new ConnectionData.Builder().user("sa").pass("sa").db(DB_NAME)
+            .host(DB_HOST).port("9092").build();
     private static boolean testTableExists = false;
 
     private static String timestamp() {
@@ -24,8 +25,8 @@ public class H2XAConnectionUtil {
     
     private static synchronized void classloadDriver() {
         try {
-            if (!isClassLoaded(DRIVER_CLASS)) {
-                Class.forName(DRIVER_CLASS);
+            if (!isClassLoaded(JDBC_DRIVER_CLASS)) {
+                Class.forName(JDBC_DRIVER_CLASS);
             }
         } catch (Exception e) {
             throw new RuntimeException(
@@ -57,7 +58,7 @@ public class H2XAConnectionUtil {
     }
 
     public static boolean isDriverClassLoaded() throws Exception {
-        return isClassLoaded(DRIVER_CLASS);
+        return isClassLoaded(JDBC_DRIVER_CLASS);
     }
 
     public synchronized static void createTestTableIfNecessary() {

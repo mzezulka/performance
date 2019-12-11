@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import javax.sql.XAConnection;
 import javax.transaction.xa.XAResource;
 
+import org.h2.tools.DeleteDbFiles;
+import static com.hp.mwtests.ts.arjuna.performance.sql.Constants.*;
+
 public class JdbcXAResourceProvider {
     private XAConnection xaConn;
     private Connection conn;
@@ -49,5 +52,6 @@ public class JdbcXAResourceProvider {
         } catch (SQLException sqle) {
             throw new RuntimeException(sqle);
         }
+        DeleteDbFiles.execute(DB_FILE_PATH, DB_NAME, true);
     }
 }

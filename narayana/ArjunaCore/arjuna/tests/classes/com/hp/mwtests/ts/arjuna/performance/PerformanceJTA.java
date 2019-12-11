@@ -59,6 +59,7 @@ public class PerformanceJTA {
     
     @TearDown(Level.Trial)
     public void finish() {
+        
         jdbcResProv.close();
     }
     
