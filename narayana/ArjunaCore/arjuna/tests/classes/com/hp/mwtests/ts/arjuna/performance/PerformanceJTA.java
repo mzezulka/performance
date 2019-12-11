@@ -100,7 +100,6 @@ public class PerformanceJTA {
 
     @Benchmark
     public boolean realResource() {
-        jdbcResProv.init();
         try {
             tm.begin();
             tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
@@ -109,8 +108,6 @@ public class PerformanceJTA {
             tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            jdbcResProv.close();
         }
         return false;
     }
