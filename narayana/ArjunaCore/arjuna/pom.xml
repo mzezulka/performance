@@ -115,9 +115,9 @@
             <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>io.jaegertracing</groupId>
-            <artifactId>jaeger-core</artifactId>
-            <version>0.35.5</version>
+            <groupId>io.narayana.tracing</groupId>
+            <artifactId>narayanatracing</artifactId>
+            <version>${org.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
