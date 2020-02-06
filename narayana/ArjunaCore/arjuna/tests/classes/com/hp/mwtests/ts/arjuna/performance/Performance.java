@@ -31,28 +31,13 @@
 
 package com.hp.mwtests.ts.arjuna.performance;
 
-import java.util.Arrays;
-
-import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.CommandLineOptionException;
-
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
-import com.hp.mwtests.ts.arjuna.JMHConfigCore;
 
-import io.opentracing.util.GlobalTracer;
-
-//@Warmup(iterations = JMHConfigCore.WI, time = JMHConfigCore.WT)
-// , timeUnit = JMHConfigCore.WTU)
-//@Measurement(iterations = JMHConfigCore.MI, time = JMHConfigCore.MT)
-// , timeUnit = JMHConfigCore.MTU)
-//@Fork(JMHConfigCore.BF)
-//@Threads(JMHConfigCore.BT)
 public class Performance {
     @State(Scope.Thread)
     public static class BenchmarkState {
@@ -119,9 +104,5 @@ public class Performance {
             throw new RuntimeException(e);
         }
         return false;
-    }
-
-    public static void main(String[] args) throws RunnerException, CommandLineOptionException {
-        JMHConfigCore.runJTABenchmark(Performance.class.getSimpleName(), args);
     }
 }

@@ -32,38 +32,17 @@ package com.hp.mwtests.ts.arjuna.performance;
  */
 import javax.transaction.TransactionManager;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.CommandLineOptionException;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
-import com.hp.mwtests.ts.arjuna.JMHConfigCore;
-import com.hp.mwtests.ts.arjuna.performance.sql.JdbcXAResourceProvider;
 
 @State(Scope.Thread)
 public class PerformanceJTA {
     
-    private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();    
-    private JdbcXAResourceProvider jdbcResProv = new JdbcXAResourceProvider();
+    private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
     
-    @Setup(Level.Trial)
-    public void setup() {
-        jdbcResProv.init();
-        JdbcXAResourceProvider.createTestTableIfNecessary();
-    }
-    
-    @TearDown(Level.Trial)
-    public void finish() {
-        
-        jdbcResProv.close();
-    }
-    
-
     static {
         TracingHelper.registerTracer();
         try {
@@ -100,12 +79,10 @@ public class PerformanceJTA {
     }
 
     @Benchmark
-    public boolean realResource() {
+    public boolean simple() {
         try {
             tm.begin();
-            tm.getTransaction().enlistResource(jdbcResProv.getJdbcResource());
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            jdbcResProv.executeStatement();
             tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -124,9 +101,5 @@ public class PerformanceJTA {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void main(String[] args) throws RunnerException, CommandLineOptionException {
-        JMHConfigCore.runJTABenchmark(PerformanceJTA.class.getSimpleName(), args);
     }
 }
