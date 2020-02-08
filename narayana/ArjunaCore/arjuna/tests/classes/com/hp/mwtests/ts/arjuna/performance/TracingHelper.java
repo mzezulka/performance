@@ -25,8 +25,8 @@ public class TracingHelper {
                 .withAgentPort(Integer.decode(CONFIG.getProperty("jaeger.reporter_port")));
         ReporterConfiguration reporterConfig = new ReporterConfiguration()
                 .withLogSpans(true)
-                .withFlushInterval(1000)
-                .withMaxQueueSize(10000)
+                .withFlushInterval(100)
+                .withMaxQueueSize(2000)
                 .withSender(senderConfig);
         Builder bldr = new Configuration("tx-demo-perf-tests")
                 .withSampler(samplerConfig)
