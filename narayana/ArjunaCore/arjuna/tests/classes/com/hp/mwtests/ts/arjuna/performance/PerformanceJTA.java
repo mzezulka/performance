@@ -66,7 +66,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    //@Benchmark
+    @Benchmark
     public boolean rollback() {
         try {
             tm.begin();
@@ -78,7 +78,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    //@Benchmark
+    @Benchmark
     public boolean simple() {
         try {
             tm.begin();
@@ -90,7 +90,7 @@ public class PerformanceJTA {
         return false;
     }
     
-    //@Benchmark
+    @Benchmark
     public boolean timeout() {
         try {
             tm.setTransactionTimeout(1);
