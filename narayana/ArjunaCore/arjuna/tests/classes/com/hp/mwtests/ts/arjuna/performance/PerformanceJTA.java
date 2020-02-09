@@ -66,7 +66,7 @@ public class PerformanceJTA {
         return true;
     }
 
-    @Benchmark
+    //@Benchmark
     public boolean rollback() {
         try {
             tm.begin();
