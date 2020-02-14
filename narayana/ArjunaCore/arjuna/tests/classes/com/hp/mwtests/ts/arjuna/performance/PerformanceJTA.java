@@ -52,7 +52,7 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 public class PerformanceJTA {
     
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-    private static final int BLACKHOLE_TOKENS = 1000; 
+    private static final int BLACKHOLE_TOKENS = 1_000_000; 
     
     static {
         TracingHelper.registerTracer();
@@ -111,7 +111,7 @@ public class PerformanceJTA {
             tm.setTransactionTimeout(1);
             tm.begin();
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Blackhole.consumeCPU(1_000_000);
+            Blackhole.consumeCPU(1_000_000_000);
             throw new RuntimeException("Exceeded transaction timeout but still running.");
         } catch (Exception e) {
             throw new RuntimeException(e);
