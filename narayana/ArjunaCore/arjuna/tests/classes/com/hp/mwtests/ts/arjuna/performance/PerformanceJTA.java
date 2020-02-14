@@ -34,14 +34,25 @@ import javax.transaction.TransactionManager;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.infra.Blackhole;
+
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
+/*
+ * We need to rapidly decrease number of perftest iterations. That way,
+ * we approach the way Narayana will behave in a "regular" environment - 
+ * that is, Narayana does not deal with hundreds of thousands of transactions per second.
+ * 
+ * To achieve the intentional perf tests degradation, we will use the JMH blackhole,
+ * especially Blackhole.consumeCPU which tries to be as machine-independent as possible.
+ */
 @State(Scope.Thread)
 public class PerformanceJTA {
     
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    private static final int BLACKHOLE_TOKENS = 1000; 
     
     static {
         TracingHelper.registerTracer();
@@ -58,7 +69,9 @@ public class PerformanceJTA {
         try {
             tm.begin();
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
             tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
+            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
             tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -71,6 +84,7 @@ public class PerformanceJTA {
         try {
             tm.begin();
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
             tm.rollback();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -79,10 +93,11 @@ public class PerformanceJTA {
     }
 
     @Benchmark
-    public boolean simple() {
+    public boolean simple(Blackhole bh) {
         try {
             tm.begin();
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
             tm.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -91,12 +106,12 @@ public class PerformanceJTA {
     }
     
     @Benchmark
-    public boolean timeout() {
+    public boolean timeout(Blackhole bh) {
         try {
             tm.setTransactionTimeout(1);
             tm.begin();
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Thread.sleep(1200);
+            Blackhole.consumeCPU(1_000_000);
             throw new RuntimeException("Exceeded transaction timeout but still running.");
         } catch (Exception e) {
             throw new RuntimeException(e);
