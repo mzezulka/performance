@@ -2,16 +2,8 @@ package com.hp.mwtests.ts.arjuna.performance;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Properties;
-
-import com.wavefront.opentracing.WavefrontTracer;
-import com.wavefront.opentracing.reporting.Reporter;
-import com.wavefront.opentracing.reporting.WavefrontSpanReporter;
-import com.wavefront.sdk.common.WavefrontSender;
-import com.wavefront.sdk.common.application.ApplicationTags;
-import com.wavefront.sdk.proxy.WavefrontProxyClient;
 
 import io.jaegertracing.Configuration;
 import io.jaegertracing.Configuration.ReporterConfiguration;
@@ -41,18 +33,6 @@ public class TracingHelper {
                 .withReporter(reporterConfig)
                 .getTracerBuilder();
         return bldr.build();
-    }
-    
-    static Tracer getLightstepTracer() {
-        try {
-            return new com.lightstep.tracer.jre.JRETracer(
-                    new com.lightstep.tracer.shared.Options.OptionsBuilder()
-                    .withAccessToken("")
-                    .withComponentName("tx-demo-perf-tests")
-                    .build());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     static Properties loadConfig() {
