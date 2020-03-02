@@ -2,8 +2,16 @@ package com.hp.mwtests.ts.arjuna.performance;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Properties;
+
+import com.wavefront.opentracing.WavefrontTracer;
+import com.wavefront.opentracing.reporting.Reporter;
+import com.wavefront.opentracing.reporting.WavefrontSpanReporter;
+import com.wavefront.sdk.common.WavefrontSender;
+import com.wavefront.sdk.common.application.ApplicationTags;
+import com.wavefront.sdk.proxy.WavefrontProxyClient;
 
 import io.jaegertracing.Configuration;
 import io.jaegertracing.Configuration.ReporterConfiguration;
@@ -36,11 +44,15 @@ public class TracingHelper {
     }
     
     static Tracer getLightstepTracer() {
-        throw new IllegalArgumentException("Not supported yet!");
-    }
-    
-    static Tracer getWavefrontTracer() {
-        throw new IllegalArgumentException("Not supported yet!");
+        try {
+            return new com.lightstep.tracer.jre.JRETracer(
+                    new com.lightstep.tracer.shared.Options.OptionsBuilder()
+                    .withAccessToken("")
+                    .withComponentName("tx-demo-perf-tests")
+                    .build());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static Properties loadConfig() {
@@ -55,7 +67,7 @@ public class TracingHelper {
     }
     
     private enum TracerType {
-        JAEGER, LIGHTSTEP, WAVEFRONT, NOOP;
+        JAEGER, NOOP;
     }
     
     static void registerTracer() {
@@ -63,12 +75,6 @@ public class TracingHelper {
         switch (TracerType.valueOf(tracer)) {
         case JAEGER:
             GlobalTracer.registerIfAbsent(TracingHelper.getJaegerTracer());
-            break;
-        case LIGHTSTEP:
-            GlobalTracer.registerIfAbsent(getLightstepTracer());
-            break;
-        case WAVEFRONT:
-            GlobalTracer.registerIfAbsent(getWavefrontTracer());
             break;
         case NOOP:
             break;
