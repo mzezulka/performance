@@ -25,14 +25,22 @@ public class TracingHelper {
                 .withAgentPort(Integer.decode(CONFIG.getProperty("jaeger.reporter_port")));
         ReporterConfiguration reporterConfig = new ReporterConfiguration()
                 .withLogSpans(true)
-                .withFlushInterval(100)
-                .withMaxQueueSize(2000)
+                .withFlushInterval(Integer.valueOf(CONFIG.getProperty("jaeger.flush_interval")))
+                .withMaxQueueSize(Integer.valueOf(CONFIG.getProperty("jaeger.max_queue_size")))
                 .withSender(senderConfig);
         Builder bldr = new Configuration("tx-demo-perf-tests")
                 .withSampler(samplerConfig)
                 .withReporter(reporterConfig)
                 .getTracerBuilder();
         return bldr.build();
+    }
+    
+    static Tracer getLightstepTracer() {
+        throw new IllegalArgumentException("Not supported yet!");
+    }
+    
+    static Tracer getWavefrontTracer() {
+        throw new IllegalArgumentException("Not supported yet!");
     }
 
     static Properties loadConfig() {
@@ -47,14 +55,20 @@ public class TracingHelper {
     }
     
     private enum TracerType {
-        JAEGER, NOOP;
+        JAEGER, LIGHTSTEP, WAVEFRONT, NOOP;
     }
     
     static void registerTracer() {
-        String tracer = System.getProperty("tracing", "NOOP").toUpperCase();
+        String tracer = System.getProperty("tracing", CONFIG.getProperty("tracer.default")).toUpperCase();
         switch (TracerType.valueOf(tracer)) {
         case JAEGER:
             GlobalTracer.registerIfAbsent(TracingHelper.getJaegerTracer());
+            break;
+        case LIGHTSTEP:
+            GlobalTracer.registerIfAbsent(getLightstepTracer());
+            break;
+        case WAVEFRONT:
+            GlobalTracer.registerIfAbsent(getWavefrontTracer());
             break;
         case NOOP:
             break;
