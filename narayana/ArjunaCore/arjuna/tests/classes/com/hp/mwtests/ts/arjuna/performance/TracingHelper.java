@@ -36,7 +36,7 @@ public class TracingHelper {
     }
 
     static Properties loadConfig() {
-        try (InputStream fs = Performance.class.getClassLoader().getResourceAsStream(TRACER_CONFIG_LOCATION)) {
+        try (InputStream fs = TracingHelper.class.getClassLoader().getResourceAsStream(TRACER_CONFIG_LOCATION)) {
             Properties config = new Properties();
             config.load(fs);
             return config;
