@@ -1,5 +1,11 @@
 package com.hp.mwtests.ts.arjuna.performance;
 
+
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2006, Red Hat Middleware LLC, and individual contributors
@@ -65,56 +71,69 @@ public class PerformanceJTA {
     }
 
     @Benchmark
-    public boolean twoPhaseCommit() {
-        try {
-            tm.begin();
-            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
-            tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
-            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
-            tm.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public boolean twoPhaseCommit(Blackhole bh) throws IllegalStateException, RollbackException, SystemException,
+    NotSupportedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        bh.consume(twoPhaseCommitImple());
+        return true;
+    }
+
+    public boolean twoPhaseCommitImple() throws IllegalStateException, RollbackException, SystemException,
+    NotSupportedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        tm.begin();
+        tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+        Blackhole.consumeCPU(BLACKHOLE_TOKENS);
+        tm.getTransaction().enlistResource(new DummyXAResource("demo2"));
+        Blackhole.consumeCPU(BLACKHOLE_TOKENS);
+        tm.commit();
         return true;
     }
 
     @Benchmark
-    public boolean rollback() {
-        try {
-            tm.begin();
-            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
-            tm.rollback();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public boolean rollback(Blackhole bh) throws NotSupportedException, SystemException, IllegalStateException, RollbackException {
+        bh.consume(rollbackImple());
         return true;
     }
 
     @Benchmark
-    public boolean simple(Blackhole bh) {
-        try {
-            tm.begin();
-            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Blackhole.consumeCPU(BLACKHOLE_TOKENS);
-            tm.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public boolean rollbackImple() throws NotSupportedException, SystemException, IllegalStateException, RollbackException {
+        tm.begin();
+        tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+        Blackhole.consumeCPU(BLACKHOLE_TOKENS);
+        tm.rollback();
+        return true;
+    }
+
+    @Benchmark 
+    public boolean simple(Blackhole bh) throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        bh.consume(simpleImple());
+        return true;
+    }
+
+    public boolean simpleImple() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        tm.begin();
+        tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+        Blackhole.consumeCPU(BLACKHOLE_TOKENS);
+        tm.commit();
         return false;
     }
-    
+
     @Benchmark
-    public boolean timeout(Blackhole bh) {
+    public boolean timeout(Blackhole bh) throws SystemException, NotSupportedException, IllegalStateException, RollbackException, InterruptedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        bh.consume(timeoutImple());
+        return true;
+    }
+
+    public boolean timeoutImple() throws SystemException, NotSupportedException, IllegalStateException, RollbackException, InterruptedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
         try {
             tm.setTransactionTimeout(1);
             tm.begin();
             tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Blackhole.consumeCPU(1_000_000_000);
-            throw new RuntimeException("Exceeded transaction timeout but still running.");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            Thread.sleep(1100);
+            tm.commit();    
+        } catch(RollbackException re) {
+            // this is what we expect, do not let this exception hinder perftest results
+            return true;
         }
+        throw new RuntimeException("Exceeded transaction timeout but still running.");
     }
 }
