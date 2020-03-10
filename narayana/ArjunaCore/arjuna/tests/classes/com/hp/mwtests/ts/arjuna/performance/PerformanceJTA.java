@@ -37,6 +37,8 @@ import javax.transaction.SystemException;
  * $Id: Performance1.java 2342 2006-03-30 13:06:17Z  $
  */
 import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
@@ -93,8 +95,7 @@ public class PerformanceJTA {
         bh.consume(rollbackImple());
         return true;
     }
-
-    @Benchmark
+    
     public boolean rollbackImple() throws NotSupportedException, SystemException, IllegalStateException, RollbackException {
         tm.begin();
         tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
@@ -104,36 +105,38 @@ public class PerformanceJTA {
     }
 
     @Benchmark 
-    public boolean simple(Blackhole bh) throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
-        bh.consume(simpleImple());
+    public boolean onePhaseCommit(Blackhole bh) throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        bh.consume(onePhaseCommitImple());
         return true;
     }
 
-    public boolean simpleImple() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+    public boolean onePhaseCommitImple() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
         tm.begin();
         tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
         Blackhole.consumeCPU(BLACKHOLE_TOKENS);
         tm.commit();
-        return false;
-    }
-
-    @Benchmark
-    public boolean timeout(Blackhole bh) throws SystemException, NotSupportedException, IllegalStateException, RollbackException, InterruptedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
-        bh.consume(timeoutImple());
         return true;
     }
 
-    public boolean timeoutImple() throws SystemException, NotSupportedException, IllegalStateException, RollbackException, InterruptedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+    @Benchmark
+    public boolean resourceFailsToPrepare(Blackhole bh) throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        bh.consume(resourceFailsToPrepareImple());
+        return true;
+    }    
+
+
+    public boolean resourceFailsToPrepareImple() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+        tm.begin();
+        tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
+        XAResource prepareFail = new DummyXAResource("fail", DummyXAResource.FaultType.PREPARE_FAIL);
+        tm.getTransaction().enlistResource(prepareFail);
         try {
-            tm.setTransactionTimeout(1);
-            tm.begin();
-            tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
-            Thread.sleep(1100);
             tm.commit();    
         } catch(RollbackException re) {
-            // this is what we expect, do not let this exception hinder perftest results
+            // ok, this is what we expect
             return true;
         }
-        throw new RuntimeException("Exceeded transaction timeout but still running.");
+        throw new RuntimeException(String.format("The second resource %s should have failed to prepare but "
+                + "TransactionManager.commit did not throw RollbackException.", prepareFail));
     }
 }
