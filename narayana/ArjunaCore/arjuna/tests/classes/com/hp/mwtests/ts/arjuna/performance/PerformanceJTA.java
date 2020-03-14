@@ -60,7 +60,7 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 public class PerformanceJTA {
     
     private TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-    private static final int BLACKHOLE_TOKENS = 1_000_000; 
+    private static final int BLACKHOLE_TOKENS = 2_000_000;
     
     static {
         TracingHelper.registerTracer();
