@@ -130,6 +130,7 @@ public class PerformanceJTA {
         tm.getTransaction().enlistResource(new DummyXAResource("demo1"));
         XAResource prepareFail = new DummyXAResource("fail", DummyXAResource.FaultType.PREPARE_FAIL);
         tm.getTransaction().enlistResource(prepareFail);
+        Blackhole.consumeCPU(BLACKHOLE_TOKENS);
         try {
             tm.commit();    
         } catch(RollbackException re) {
